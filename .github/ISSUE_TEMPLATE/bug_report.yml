@@ -1,0 +1,29 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem / 提交可复现的问题
+labels: [bug]
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / 运行环境
+      description: OS, browser/version, Node version, workbench; whether optional models are installed.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: Include a minimal, publicly shareable sample if possible. Do not upload secrets or private assets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result / 期望与实际效果
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or logs / 截图或日志
+      description: Remove API keys, personal information and private images before posting.

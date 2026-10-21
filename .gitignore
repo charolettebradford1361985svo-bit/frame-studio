@@ -1,0 +1,25 @@
+node_modules/
+.logs/
+.playwright-cli/
+.venv/
+.env*
+!.env.example
+dist/
+.models/
+.tools/
+__pycache__/
+*.py[cod]
+*.log
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# Local implementation notes and legacy one-machine browser checks.
+*-qa.md
+scripts/qa-library.cjs
+# Keep private working instructions and raw generation records on this machine.
+/AGENTS.md
+/public/frame-studio-logo-prompt.txt
+/public/scenes/asset-prompts.txt

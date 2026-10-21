@@ -1,0 +1,36 @@
+{
+  "name": "frame-studio",
+  "version": "0.1.0",
+  "description": "Local-first 2D game asset workbench for sprite animation, frame alignment, character assembly and scene previews.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/charolettebradford1361985svo-bit/frame-studio.git"
+  },
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:ui": "vite",
+    "api": "node --env-file-if-exists=.env server/index.mjs",
+    "test": "node --test tests/core.test.mjs tests/api.test.mjs tests/library.test.mjs tests/sprite-editor.test.mjs tests/animation-tools.test.mjs tests/rig.test.mjs tests/scene-terrain.test.mjs tests/workbenches.test.mjs tests/project-import.test.mjs",
+    "build": "vite build && node scripts/prepare-sites-build.mjs",
+    "preview": "vite preview",
+    "test:sites": "node --test tests/sites-worker.test.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@runwayml/sdk": "^4.21.0",
+    "@vitejs/plugin-react": "5.0.4",
+    "fflate": "^0.8.3",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "vite": "6.4.5"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5"
+  }
+}
