@@ -1,9 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { publicAssetsPlugin } from "./scripts/public-assets.mjs";
 
 export default defineConfig({
   resolve: { dedupe: ["react", "react-dom"] },
   build: {
+    copyPublicDir: false,
     outDir: "dist/client",
   },
   optimizeDeps: {
@@ -17,5 +19,5 @@ export default defineConfig({
       clientFiles: ["./src/main.jsx"],
     },
   },
-  plugins: [react()],
+  plugins: [react(), publicAssetsPlugin()],
 });

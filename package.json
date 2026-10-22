@@ -16,7 +16,7 @@
     "dev": "node scripts/dev.mjs",
     "dev:ui": "vite",
     "api": "node --env-file-if-exists=.env server/index.mjs",
-    "test": "node --test tests/core.test.mjs tests/api.test.mjs tests/library.test.mjs tests/sprite-editor.test.mjs tests/animation-tools.test.mjs tests/rig.test.mjs tests/scene-terrain.test.mjs tests/workbenches.test.mjs tests/project-import.test.mjs",
+    "test": "node --test tests/core.test.mjs tests/api.test.mjs tests/library.test.mjs tests/sprite-editor.test.mjs tests/animation-tools.test.mjs tests/rig.test.mjs tests/scene-terrain.test.mjs tests/workbenches.test.mjs tests/project-import.test.mjs tests/public-assets.test.mjs tests/media-lifecycle.test.mjs",
     "build": "vite build && node scripts/prepare-sites-build.mjs",
     "preview": "vite preview",
     "test:sites": "node --test tests/sites-worker.test.mjs"

@@ -46,8 +46,10 @@ export async function extractFrames(url, start, end, count, maxEdge, progress, s
       signal?.throwIfAborted();
       ctx.drawImage(video, 0, 0, size.width, size.height);
       const blob = await canvasBlob(canvas);
+      signal?.throwIfAborted();
       frames.push({ blob, url: URL.createObjectURL(blob), time, ...size }); progress(i + 1, count);
     }
+    signal?.throwIfAborted();
     return frames;
   } catch (error) { disposeFrames(frames); throw error; }
   finally { disposeVideo(video); }
@@ -59,14 +61,20 @@ export async function applyChroma(frames, hex, tolerance, progress, signal) {
     for (const [i, frame] of frames.entries()) {
       signal?.throwIfAborted();
       const bitmap = await createImageBitmap(frame.blob);
-      const canvas = document.createElement('canvas'); canvas.width = frame.width; canvas.height = frame.height;
-      const ctx = canvas.getContext('2d'); ctx.drawImage(bitmap, 0, 0); bitmap.close();
+      let canvas, ctx;
+      try {
+        signal?.throwIfAborted();
+        canvas = document.createElement('canvas'); canvas.width = frame.width; canvas.height = frame.height;
+        ctx = canvas.getContext('2d'); ctx.drawImage(bitmap, 0, 0);
+      } finally { bitmap.close(); }
       const pixels = ctx.getImageData(0, 0, frame.width, frame.height);
       pixels.data.set(chromaKey(pixels.data, rgb, tolerance, 24, frame.width, frame.height)); ctx.putImageData(pixels, 0, 0);
-      const blob = await canvasBlob(canvas); out.push({ ...frame, blob, url: URL.createObjectURL(blob) });
+      const blob = await canvasBlob(canvas); signal?.throwIfAborted();
+      out.push({ ...frame, blob, url: URL.createObjectURL(blob) });
       progress(i + 1, frames.length);
       await new Promise(resolve => setTimeout(resolve, 0));
     }
+    signal?.throwIfAborted();
     return out;
   } catch (error) { disposeFrames(out); throw error; }
 }
@@ -107,7 +115,8 @@ export async function exportArchive(frames, fps, format) {
     const ctx = canvas.getContext('2d');
     for (const [i, frame] of frames.entries()) {
       const image = await createImageBitmap(frame.blob);
-      ctx.drawImage(image, (i % columns) * width, Math.floor(i / columns) * height); image.close();
+      try { ctx.drawImage(image, (i % columns) * width, Math.floor(i / columns) * height); }
+      finally { image.close(); }
     }
     files['sheet.png'] = [new Uint8Array(await (await canvasBlob(canvas)).arrayBuffer()), { level: 0 }];
     manifest.sheet = { file: 'sheet.png', columns, rows };

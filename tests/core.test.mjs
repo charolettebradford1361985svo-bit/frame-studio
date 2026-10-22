@@ -157,3 +157,46 @@ test('export manifest preserves timestamps, uniform canvas and playback duration
   assert.equal(frameName(0), 'frame_0001.png');
   }
 });
+
+test('output dimensions reject malformed video metadata and invalid edge limits', () => {
+  for (const value of [0, -1, NaN, Infinity, -Infinity, undefined, null, '1920', 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => outputSize(value, 1080, 512), RangeError);
+    assert.throws(() => outputSize(1920, value, 512), RangeError);
+    assert.throws(() => outputSize(1920, 1080, value), RangeError);
+  }
+});
+
+test('valid output dimensions stay integral, bounded and never upscale across aspect ratios', () => {
+  let cases = 0;
+  for (const width of [1, 2, 7, 31, 100, 1080, 1920, 4096]) {
+    for (const height of [1, 2, 7, 31, 100, 1080, 1920, 4096]) {
+      for (const limit of [1, 256, 512, 1024]) {
+        const result = outputSize(width, height, limit);
+        assert.ok(Number.isSafeInteger(result.width) && result.width >= 1 && result.width <= width);
+        assert.ok(Number.isSafeInteger(result.height) && result.height >= 1 && result.height <= height);
+        assert.ok(Math.max(result.width, result.height) <= limit);
+        cases++;
+      }
+    }
+  }
+  assert.equal(cases, 256);
+});
+
+test('invalid decoded video dimensions fail before canvas allocation and release the decoder', async t => {
+  const previousDocument = globalThis.document;
+  let canvasAllocations = 0, releases = 0;
+  const video = new EventTarget();
+  Object.assign(video, { duration: 5, videoWidth: 0, videoHeight: 1080,
+    pause() {}, removeAttribute() {}, load() { releases++; } });
+  Object.defineProperty(video, 'src', { set() { queueMicrotask(() => video.dispatchEvent(new Event('loadeddata'))); } });
+  globalThis.document = { createElement(type) {
+    if (type === 'video') return video;
+    canvasAllocations++;
+    throw new Error('Canvas must not be allocated for invalid dimensions');
+  } };
+  t.after(() => { if (previousDocument === undefined) delete globalThis.document; else globalThis.document = previousDocument; });
+  const { extractFrames } = await import('../src/lib/media.mjs');
+  await assert.rejects(extractFrames('synthetic-no-network', 0, 5, 8, 512, () => {}), RangeError);
+  assert.equal(canvasAllocations, 0);
+  assert.equal(releases, 1);
+});

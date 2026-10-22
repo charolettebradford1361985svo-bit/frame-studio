@@ -8,6 +8,8 @@ export function sampleTimes(start, end, count) {
 }
 export const frameName = index => `frame_${String(index + 1).padStart(4, '0')}.png`;
 export function outputSize(width, height, maxEdge) {
+  if (![width, height, maxEdge].every(value => Number.isSafeInteger(value) && value > 0))
+    throw new RangeError('视频尺寸和最长边必须为有效正整数');
   const scale = Math.min(1, maxEdge / Math.max(width, height));
   return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
 }
